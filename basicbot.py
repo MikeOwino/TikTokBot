@@ -1,4 +1,6 @@
 import os
+import random
+import string
 import glob
 from TikTokApi import TikTokApi
 
@@ -17,13 +19,18 @@ clearTMP('output/output.mp4')
 
 # Vars
 count = 30
-api = TikTokApi()
 
-results = api.trending(count=count)
+verifyFp = "verify_" + ''.join(random.choice(string.letters) for num in range(40))
+api = TikTokApi.get_instance(custom_verifyFp=verifyFp)
+did = str(random.randint(10000, 999999999))
+
+# I recommend using api = TikTokApi.get_instance(custom_verifyFp=verifyFp, use_test_endpoints=True) instead
+# of the following line, but I can't guarantee support for the use_test_endpoints parameter into the future
+results = api.trending(count=count, custom_did=did)
 prevloops = 0
 for res in results:
     open('downloaded/' + str(prevloops) +
-            ".mp4", "wb").write(api.get_Video_By_TikTok(res))
+            ".mp4", "wb").write(api.get_Video_By_TikTok(res, custom_did=did))
     open("downloaded/concat.txt", 'a').write("file " +
                                                 str(prevloops) + ".mkv" + "\n")
     os.system("ffmpeg -loglevel panic -i downloaded/" + str(prevloops) +
